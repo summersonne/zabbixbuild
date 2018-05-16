@@ -14,7 +14,7 @@ done
 /usr/bin/rm -f /tmp/$rpmver #cleanind previously downloaded file
 /bin/echo "Done cleaning"
 /usr/bin/wget http://repo.zabbix.com/zabbix/3.0/rhel/7/SRPMS/$rpmver -P /tmp/
-/usr/bin/rpm -i /tmp/zabbix-3.0.0-1.el7.src.rpm
+/usr/bin/rpm -i /tmp/$rpmver
 #--------------------------------git files--------------
 url_download_path=""
 file_git_download=()
