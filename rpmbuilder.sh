@@ -55,4 +55,4 @@ for fgt1 in "${file_git_download[@]}"; do
 done
 
 /bin/echo "Starting building"
-/usr/bin/rpmbuild -ba /home/builder/SPECS/zabbix.spec
+/usr/bin/rpmbuild -ba /home/builder/rpmbuild/SPECS/zabbix.spec
