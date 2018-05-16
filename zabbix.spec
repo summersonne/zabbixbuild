@@ -1,5 +1,5 @@
 Name:		zabbix
-Version:	3.0.0
+Version:	3.0.16
 Release: 	1%{?alphatag:.%{alphatag}}%{?dist}
 Summary:	The Enterprise-class open source monitoring solution
 Group:		Applications/Internet
