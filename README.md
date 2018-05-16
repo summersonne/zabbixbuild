@@ -1,2 +1,3 @@
 # zabbixbuild
-spec and patcj files
+spec and patch files
+Also build script
