@@ -25,7 +25,6 @@ RUN yum -y install iksemel
 RUN wget http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/i/iksemel-devel-1.4-6.el7.x86_64.rpm
 RUN rpm -Uvh iksemel-devel-1.4-6.el7.x86_64.rpm
 RUN yum -y install iksemel-devel
-
 #user setup
 
 RUN useradd builder -u 1000 -m -G users,wheel
@@ -33,5 +32,7 @@ RUN echo "builder ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER builder
 RUN mkdir -p /home/builder/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 RUN echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
+#build process start
 RUN wget https://raw.githubusercontent.com/summersonne/zabbixbuild/master/rpmbuilder.sh -P /tmp/
 RUN chmod +x /tmp/rpmbuilder.sh
+RUN sh /tmp/rpmbuilder.sh
