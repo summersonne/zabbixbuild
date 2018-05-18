@@ -1,7 +1,11 @@
-rpmver='zabbix-3.0.16-1.el7.src.rpm'
-mainpath='/home/builder/rpmbuild/'
+#The script will do all inside build work
+
+rpmver='zabbix-3.0.16-1.el7.src.rpm' #what version we need to build
+mainpath='/home/builder/rpmbuild/'   #where we store all things
 /bin/echo "mainpth = $mainpath"
-#Cleaning the directories
+
+#Cleaning the directories. Not necessary inside Docker but can be useful on standalone Linux
+
 mypath=( $( /bin/ls -l /home/builder/rpmbuild/ | /usr/bin/awk '{print $9}' ) )
 /bin/echo ${mypath[@]}
 for mpt in "${mypath[@]}"; do
@@ -11,11 +15,11 @@ for mpt in "${mypath[@]}"; do
       /bin/rm -rf $path_delete
 done
 
-/usr/bin/rm -f /tmp/$rpmver #cleanind previously downloaded file
+/usr/bin/rm -f /tmp/$rpmver          #cleaning previously downloaded file
 /bin/echo "Done cleaning"
-/usr/bin/wget http://repo.zabbix.com/zabbix/3.0/rhel/7/SRPMS/$rpmver -P /tmp/
-/usr/bin/rpm -i /tmp/$rpmver
-#--------------------------------git files--------------
+/usr/bin/wget http://repo.zabbix.com/zabbix/3.0/rhel/7/SRPMS/$rpmver -P /tmp/ #downloading SRPM
+/usr/bin/rpm -i /tmp/$rpmver #extacting source from SRPM
+#Downloading SPEC and patch files from Github
 url_download_path=""
 file_git_download=()
 file_patch="zabbixpatch.patch"
@@ -23,6 +27,8 @@ file_spec="zabbix.spec"
 file_git_download+=($file_patch)
 file_git_download+=($file_spec)
 /bin/echo "Downloading from git = " ${file_git_download[@]}
+
+#starting working with github files
 
 for fgt in "${file_git_download[@]}"; do
     /bin/echo "fgt = $fgt"
@@ -36,7 +42,9 @@ for fgt in "${file_git_download[@]}"; do
             /usr/bin/wget https://raw.githubusercontent.com/summersonne/zabbixbuild/master/zabbix.spec
     fi
 done
-#--------------------------------- copy downloaded files  -------------------------------------
+
+#copying files to SPEC and SOURCE
+
 /bin/echo "Files downloaded now we copy it"
 dest_rpmpatch="/home/builder/rpmbuild/SOURCES/"
 dest_rpmspec="/home/builder/rpmbuild/SPECS/"
@@ -54,5 +62,8 @@ for fgt1 in "${file_git_download[@]}"; do
     fi
 done
 
+#And final step - we starting build process. This may take a while
+
 /bin/echo "Starting building"
 /usr/bin/rpmbuild -ba /home/builder/rpmbuild/SPECS/zabbix.spec
+#that's all folks
