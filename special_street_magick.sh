@@ -13,12 +13,12 @@
 #
 # Beware here be dragons
 
-/bin/echo "Downloading Dockerfile"
-/bin/wget https://raw.githubusercontent.com/summersonne/zabbixbuild/master/Dockerfile
-/bin/echo "Starting building process. This will take a while"
-/bin/docker build -q -t="rpmbuilder" .
-/bin/docker run -dit --rm rpmbuilder
+echo "Downloading Dockerfile"
+wget https://raw.githubusercontent.com/summersonne/zabbixbuild/master/Dockerfile
+echo "Starting building process. This will take a while"
+docker build -q -t="rpmbuilder" .
+docker run -dit --rm rpmbuilder
 contID=$(docker ps -a -q)
-/bin/echo "Container ID is:"$contID
-/bin/echo "Now script will copy files from container to curren dir"
+echo "Container ID is:"$contID
+echo "Now script will copy files from container to curren dir"
 docker cp $contID:/home/builder/rpmbuild/RPMS/x86_64/ .
