@@ -24,5 +24,5 @@ echo "Now script will copy files from container to curren dir"
 docker cp $contID:/home/builder/rpmbuild/RPMS/x86_64/ .
 # Cleaning after build
 docker stop $contID
-docker rmi rpmbuilder
+docker rmi -f $ (docker images -q)
 exit 0
