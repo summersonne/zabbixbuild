@@ -25,5 +25,5 @@ docker cp $contID:/home/builder/rpmbuild/RPMS/x86_64/ .
 # Cleaning after build
 docker stop $contID
 docker rmi $(docker images -q)
-rsync -av x86_64/ rpm.kernelfire.com:/srv/repos/zabbix
+sudo -u anelidov rsync -av x86_64/ rpm.kernelfire.com:/srv/repos/zabbix
 exit 0
