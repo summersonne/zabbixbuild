@@ -35,7 +35,7 @@ for fgt in "${file_git_download[@]}"; do
     /bin/echo "Starting"
     #patch
     if [ "$fgt" = "$file_patch" ]; then
-            /usr/bin/wget https://raw.githubusercontent.com/summersonne/zabbixbuild/blob/master/zabbixpatch.patch
+            /usr/bin/wget https://raw.githubusercontent.com/summersonne/zabbixbuild/master/zabbixpatch.patch
     fi
     #spec
     if [ "$fgt" = "$file_spec" ]; then
