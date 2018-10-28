@@ -23,7 +23,7 @@ echo "Container ID is:"$contID
 echo "Now script will copy files from container to curren dir"
 docker cp $contID:/home/builder/rpmbuild/RPMS/x86_64/ .
 # Cleaning after build
-docker stop $contID
-docker rmi $(docker images -q)
-sudo -u anelidov rsync -av x86_64/ rpm.kernelfire.com:/srv/repos/zabbix
+# docker stop $contID
+# docker rmi $(docker images -q)
+# sudo -u anelidov rsync -av x86_64/ rpm.kernelfire.com:/srv/repos/zabbix
 exit 0
