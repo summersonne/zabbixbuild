@@ -1,1 +1,113 @@
-empty for now
+diff -Naur zabbix-3.4.7_orig/src/libs/zbxhistory/history_sql.c zabbix-3.4.7/src/libs/zbxhistory/history_sql.c
+--- zabbix-3.4.7_orig/src/libs/zbxhistory/history_sql.c 2018-02-19 02:23:37.000000000 -0500
++++ zabbix-3.4.7/src/libs/zbxhistory/history_sql.c      2018-02-21 14:06:00.000000000 -0500
+@@ -81,11 +81,11 @@
+
+ /* value_type - history table data mapping */
+ static zbx_vc_history_table_t  vc_history_tables[] = {
+-       {"history", "value", row2value_dbl},
+-       {"history_str", "value", row2value_str},
+-       {"history_log", "timestamp,logeventid,severity,source,value", row2value_log},
+-       {"history_uint", "value", row2value_ui64},
+-       {"history_text", "value", row2value_str}
++       {"history", "h.value", row2value_dbl},
++       {"history_str", "h.value", row2value_str},
++       {"history_log", "h.timestamp,h.logeventid,h.severity,h.source,h.value", row2value_log},
++       {"history_uint", "h.value", row2value_ui64},
++       {"history_text", "h.value", row2value_str}
+ };
+
+ /******************************************************************************************************************
+@@ -356,21 +356,28 @@
+        zbx_vc_history_table_t  *table = &vc_history_tables[value_type];
+
+        zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+-                       "select clock,ns,%s"
++                       "select h.clock,h.ns,%s"
++                       " from (select itemid, clock"
+                        " from %s"
+                        " where itemid=" ZBX_FS_UI64,
+                        table->fields, table->name, itemid);
+
+        if (1 == seconds)
+        {
+-               zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", end_timestamp);
++               zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d)", end_timestamp);
+        }
+        else
+        {
+-               zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d",
++               zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d)",
+                                end_timestamp - seconds, end_timestamp);
+        }
+
++       zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
++               " o join %s h"
++               " on h.itemid = o.itemid"
++               " and h.clock = o.clock",
++               table->name);
++
+        result = DBselect("%s", sql);
+
+        zbx_free(sql);
+@@ -441,7 +448,8 @@
+
+                sql_offset = 0;
+                zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+-                               "select clock,ns,%s"
++                               "select h.clock,h.ns,%s"
++                               " from (select itemid, clock"
+                                " from %s"
+                                " where itemid=" ZBX_FS_UI64
+                                        " and clock<=%d",
+
+										@@ -450,7 +458,13 @@
+                if (clock_from != clock_to)
+                        zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", clock_from);
+
+-               zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by clock desc");
++               zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
++                       " order by clock desc limit %d)"
++                       " o join %s h"
++                       " on h.itemid = o.itemid"
++                       " and h.clock = o.clock"
++                       " order by h.clock desc",
++                       count, table->name);
+
+                result = DBselectN(sql, count);
+
+@@ -532,21 +546,30 @@
+        zbx_vc_history_table_t  *table = &vc_history_tables[value_type];
+
+        zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+-                       "select clock,ns,%s"
++                       "select h.clock,h.ns,%s"
++                       " from (select itemid, clock"
+                        " from %s"
+                        " where itemid=" ZBX_FS_UI64,
+                        table->fields, table->name, itemid);
+
+        if (1 == seconds)
+        {
+-               zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", end_timestamp);
++               zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d limit %d)", end_timestamp, count);
+        }
+        else
+        {
+-               zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d order by clock desc",
+-                               end_timestamp - seconds, end_timestamp);
++               zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
++                               " and clock>%d and clock<=%d order by clock desc limit %d)",
++                               end_timestamp - seconds, end_timestamp, count);
+        }
+
++       zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
++               " o join %s h"
++               " on h.itemid = o.itemid"
++               " and h.clock = o.clock"
++               " order by h.clock desc",
++               table->name);
++
+        result = DBselectN(sql, count);
+
+        zbx_free(sql);
