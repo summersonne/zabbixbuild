@@ -1,6 +1,6 @@
 #The script will do all inside build work
 
-rpmver='zabbix-3.0.16-1.el7.src.rpm' #what version we need to build
+rpmver='zabbix-4.0.0-2.el7.src.rpm' #what version we need to build
 mainpath='/home/builder/rpmbuild/'   #where we store all things
 /bin/echo "mainpth = $mainpath"
 
@@ -17,7 +17,7 @@ done
 
 /usr/bin/rm -f /tmp/$rpmver          #cleaning previously downloaded file
 /bin/echo "Done cleaning"
-/usr/bin/wget http://repo.zabbix.com/zabbix/3.0/rhel/7/SRPMS/$rpmver -P /tmp/ #downloading SRPM
+/usr/bin/wget https://repo.zabbix.com/zabbix/4.0/rhel/7/SRPMS/$rpmver -P /tmp/ #downloading SRPM
 /usr/bin/rpm -i /tmp/$rpmver #extacting source from SRPM
 #Downloading SPEC and patch files from Github
 url_download_path=""
