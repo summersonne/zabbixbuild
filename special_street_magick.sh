@@ -16,12 +16,12 @@
 echo "Downloading Dockerfile"
 wget https://raw.githubusercontent.com/summersonne/zabbixbuild/master/Dockerfile
 echo "Starting building process. This will take a while"
-docker build -q -t="rpmbuilder" .
-docker run -dit --rm rpmbuilder
+sudo docker build -q -t="rpmbuilder" .
+sudo docker run -dit --rm rpmbuilder
 contID=$(docker ps -a -q)
 echo "Container ID is:"$contID
 echo "Now script will copy files from container to curren dir"
-docker cp $contID:/home/builder/rpmbuild/RPMS/x86_64/ .
+sudo docker cp $contID:/home/builder/rpmbuild/RPMS/x86_64/ .
 # Cleaning after build
 # docker stop $contID
 # docker rmi $(docker images -q)
