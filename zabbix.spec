@@ -22,7 +22,7 @@ Source15:	zabbix-tmpfiles.conf
 Patch0:		config.patch
 Patch1:		fonts-config.patch
 Patch2:		fping3-sourceip-option.patch
-Patch3:     zabbixpatch.patch
+Patch3:         zabbixpatch.patch
 
 Buildroot:	%{_tmppath}/zabbix-%{version}-%{release}-root-%(%{__id_u} -n)
 
