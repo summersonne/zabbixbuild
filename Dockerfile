@@ -26,6 +26,7 @@ RUN yum -y install iksemel
 RUN wget http://mirror.neu.edu.cn/fedora-epel/7/x86_64/i/iksemel-devel-1.4-6.el7.x86_64.rpm
 RUN rpm -Uvh iksemel-devel-1.4-6.el7.x86_64.rpm
 RUN yum -y install iksemel-devel
+RUN yum -y install libevent-devel.x86_64
 #That's all we need. Also it can take up to 2.7GB of free space. Server builds, serious business.
 
 #user setup
