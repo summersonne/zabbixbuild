@@ -23,6 +23,7 @@ Patch0:		config.patch
 Patch1:		fonts-config.patch
 Patch2:		fping3-sourceip-option.patch
 Patch3:         zabbixpatch.patch
+Patch4:		zabbix-frontend-patch.patch
 
 Buildroot:	%{_tmppath}/zabbix-%{version}-%{release}-root-%(%{__id_u} -n)
 
