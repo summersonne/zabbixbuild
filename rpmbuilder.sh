@@ -5,18 +5,18 @@ mainpath='/home/builder/rpmbuild/'   #where we store all things
 /bin/echo "mainpth = $mainpath"
 
 #Cleaning the directories. Not necessary inside Docker but can be useful on standalone Linux
-
-mypath=( $( /bin/ls -l /home/builder/rpmbuild/ | /usr/bin/awk '{print $9}' ) )
-/bin/echo ${mypath[@]}
-for mpt in "${mypath[@]}"; do
-   /bin/echo "mpt = $mpt"
-      path_delete="$mainpath$mpt/*"
-      /bin/echo "path delete = $path_delete"
-      /bin/rm -rf $path_delete
-done
-
-/usr/bin/rm -f /tmp/$rpmver          #cleaning previously downloaded file
-/bin/echo "Done cleaning"
+#
+#mypath=( $( /bin/ls -l /home/builder/rpmbuild/ | /usr/bin/awk '{print $9}' ) )
+#/bin/echo ${mypath[@]}
+#for mpt in "${mypath[@]}"; do
+#   /bin/echo "mpt = $mpt"
+#      path_delete="$mainpath$mpt/*"
+#      /bin/echo "path delete = $path_delete"
+#      /bin/rm -rf $path_delete
+#done
+#
+#/usr/bin/rm -f /tmp/$rpmver          #cleaning previously downloaded file
+#/bin/echo "Done cleaning"
 /usr/bin/wget https://repo.zabbix.com/zabbix/3.0/rhel/7/SRPMS/$rpmver -P /tmp/ #downloading SRPM
 /usr/bin/rpm -i /tmp/$rpmver #extacting source from SRPM
 #Downloading SPEC and patch files from Github
