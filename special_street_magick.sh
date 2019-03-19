@@ -22,6 +22,7 @@ contID=$(docker ps -a -q)
 echo "Container ID is:"$contID
 echo "Now script will copy files from container to curren dir"
 sudo docker cp $contID:/home/builder/rpmbuild/RPMS/x86_64/ .
+sudo docker cp $contID:/home/builder/rpmbuild/RPMS/noarch/ .
 # Cleaning after build
 # docker stop $contID
 # docker rmi $(docker images -q)
