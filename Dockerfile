@@ -20,10 +20,10 @@ RUN yum -y install OpenIPMI-devel
 RUN yum -y install libssh2-devel
 RUN yum -y install java-devel
 RUN yum -y install libxml2-devel
-RUN wget http://mirror.neu.edu.cn/fedora-epel/7/x86_64/i/iksemel-1.4-6.el7.x86_64.rpm
+RUN wget https://cbs.centos.org/kojifiles/packages/iksemel/1.4/6.el7/x86_64/iksemel-1.4-6.el7.x86_64.rpm
 RUN rpm -Uvh iksemel-1.4-6.el7.x86_64.rpm
 RUN yum -y install iksemel
-RUN wget http://mirror.neu.edu.cn/fedora-epel/7/x86_64/i/iksemel-devel-1.4-6.el7.x86_64.rpm
+RUN wget https://cbs.centos.org/kojifiles/packages/iksemel/1.4/6.el7/x86_64/iksemel-devel-1.4-6.el7.x86_64.rpm
 RUN rpm -Uvh iksemel-devel-1.4-6.el7.x86_64.rpm
 RUN yum -y install iksemel-devel
 RUN yum -y install libevent-devel.x86_64
