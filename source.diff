@@ -1,0 +1,126 @@
+--- /zabbix-3.0.2/src/libs/zbxdbcache/valuecache-orig.c	2016-06-13 09:30:12.856070400 -0400
++++ /zabbix-3.0.2/src/libs/zbxdbcache/valuecache.c	2016-06-13 09:29:45.959848700 -0400
+@@ -300,11 +300,11 @@
+ 
+ /* value_type - history table data mapping */
+ static zbx_vc_history_table_t	vc_history_tables[] = {
+-	{"history", "value", row2value_dbl},
+-	{"history_str", "value", row2value_str},
+-	{"history_log", "timestamp,logeventid,severity,source,value", row2value_log},
+-	{"history_uint", "value", row2value_ui64},
+-	{"history_text", "value", row2value_str}
++	{"history", "h.value", row2value_dbl},
++	{"history_str", "h.value", row2value_str},
++	{"history_log", "h.timestamp,h.logeventid,h.severity,h.source,h.value", row2value_log},
++	{"history_uint", "h.value", row2value_ui64},
++	{"history_text", "h.value", row2value_str}
+ };
+ 
+ /******************************************************************************
+@@ -366,20 +366,30 @@
+ 	int			ret = FAIL;
+ 
+ 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+-			"select clock,ns,%s"
++			"select h.clock,h.ns,%s"
++			" from (select itemid, clock"
+ 			" from %s"
+ 			" where itemid=" ZBX_FS_UI64,
+ 			table->fields, table->name, itemid);
+ 
+ 	if (1 == seconds)
+ 	{
+-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", end_timestamp);
++		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
++			" and clock=%d)",
++			end_timestamp);
+ 	}
+ 	else
+ 	{
+-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d",
+-				end_timestamp - seconds, end_timestamp);
++		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
++			" and clock>%d and clock<=%d)",
++			end_timestamp - seconds, end_timestamp);
+ 	}
++	
++	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
++		" o join %s h"
++		" on h.itemid = o.itemid"
++		" and h.clock = o.clock",
++		table->name);
+ 
+ 	(*queries)++;
+ 	result = DBselect("%s", sql);
+@@ -455,16 +465,25 @@
+ 
+ 		sql_offset = 0;
+ 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+-				"select clock,ns,%s"
+-				" from %s"
+-				" where itemid=" ZBX_FS_UI64
+-					" and clock<=%d",
+-				table->fields, table->name, itemid, clock_to);
++				"select h.clock,h.ns,%s"
++			" from (select itemid, clock"
++			" from %s"
++			" where itemid=" ZBX_FS_UI64
++			" and clock<=%d",
++			table->fields, table->name, itemid, clock_to);
+ 
+ 		if (clock_from != clock_to)
+-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", clock_from);
+-
+-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by clock desc");
++			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
++				" and clock>%d",
++				clock_from);
++
++		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 
++			" order by clock desc limit %d)"
++			" o join %s h"
++			" on h.itemid = o.itemid"
++			" and h.clock = o.clock"
++			" order by h.clock desc",
++			count, table->name);
+ 
+ 		(*queries)++;
+ 		result = DBselectN(sql, count);
+@@ -548,21 +567,31 @@
+ 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
+ 
+ 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+-			"select clock,ns,%s"
++			"select h.clock,h.ns,%s"
++			" from (select itemid, clock"
+ 			" from %s"
+ 			" where itemid=" ZBX_FS_UI64,
+ 			table->fields, table->name, itemid);
+ 
+ 	if (1 == seconds)
+ 	{
+-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", end_timestamp);
++		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 
++			" and clock=%d limit %d)",
++			end_timestamp, count);
+ 	}
+ 	else
+ 	{
+-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d order by clock desc",
+-				end_timestamp - seconds, end_timestamp);
+-	}
+-
++		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 
++			" and clock>%d and clock<=%d order by clock desc limit %d)",
++			end_timestamp - seconds, end_timestamp, count);
++ 	}
++	
++	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
++		" o join %s h"
++		" on h.itemid = o.itemid"
++		" and h.clock = o.clock"
++		" order by h.clock desc",
++		table->name);	
+ 	(*queries)++;
+ 	result = DBselectN(sql, count);
+ 
