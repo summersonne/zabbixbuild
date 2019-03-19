@@ -1,6 +1,6 @@
 #The script will do all inside build work
 
-rpmver='zabbix-4.0.0-2.el7.src.rpm' #what version we need to build
+rpmver='zabbix-3.0.2-1.el7.src.rpm' #what version we need to build
 mainpath='/home/builder/rpmbuild/'   #where we store all things
 /bin/echo "mainpth = $mainpath"
 
