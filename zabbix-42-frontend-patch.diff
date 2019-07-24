@@ -1,0 +1,24 @@
+--- /usr/share/zabbix/include/classes/api/managers/CHistoryManager.php.orig	2019-06-26 15:22:39.000000000 +0000
++++ /usr/share/zabbix/include/classes/api/managers/CHistoryManager.php	2019-07-05 00:47:21.362958701 +0000
+@@ -169,10 +169,17 @@
+ 			foreach ($items as $item) {
+ 				$values = DBfetchArray(DBselect(
+ 					'SELECT *'.
+-					' FROM '.self::getTableName($item['value_type']).' h'.
+-					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+-						($period ? ' AND h.clock>'.$period : '').
+-					' ORDER BY h.clock DESC',
++	                                ' FROM ('.
++	                                ' SELECT itemid, clock'.
++	                                ' FROM '.self::getTableName($item['value_type']).
++	                                ' WHERE itemid='.zbx_dbstr($item['itemid']).
++	                                        ($period ? ' AND clock>'.(time() - $period) : '').
++	                                                ' ORDER BY clock DESC LIMIT '.$limit.' OFFSET 0'.
++	                                ' ) o'.
++	                                ' JOIN '.self::getTableName($item['value_type']).' h'.
++	                                ' ON h.itemid = o.itemid '.
++	                                ($period ? ' AND h.clock = o.clock' : '').
++	                                ' ORDER by h.clock DESC',
+ 					$limit + 1
+ 				));
+ 
